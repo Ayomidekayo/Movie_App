@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import Header from './components/Header'
-import Footer from './components/footer'
+import Footer from './components/Footer'
 import MobileNavigation from './components/MobileNavigation'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
