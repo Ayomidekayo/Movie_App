@@ -5,6 +5,8 @@ import moment from 'moment'
 import Divider from '../components/Divider'
 import UseFetch from '../hooks/UseFetch'
 import HorizontalScrollCard from '../components/HorizontalScrollCard'
+import { useState } from 'react'
+import VideoPlay from '../components/VideoPlay'
 
 const Details = () => {
   const params = useParams()
@@ -14,21 +16,31 @@ const Details = () => {
   const { data: castData = { crew: [] } } = UseFetchDetails(
     `/${params.explore}/${params.id}/credits`
   )
-  const {data:similarData}=UseFetch(`/${params?.explore}/${params?.id}/similar`)
-  const {data:recommendationData}=UseFetch(`/${params?.explore}/${params?.id}/recommendations`)
+  const { data: similarData } = UseFetch(
+    `/${params?.explore}/${params?.id}/similar`
+  )
+  const { data: recommendationData } = UseFetch(
+    `/${params?.explore}/${params?.id}/recommendations`
+  )
 
   const director = castData?.crew?.find((el) => el.job === 'Director')?.name
   const duration = (data?.runtime / 60)?.toFixed(1)?.split('.')
 
   const writer = castData?.crew?.find((el) => el.job === 'Writer')?.name
   //castData?.crew?.filter(el => el?.job === "Writer")?.map(el => el?.name)?.join(", ")
+
+  const [playVideo,setPlayVideo]=useState(false);
+   const [playVideoId,setPlayVideoId]=useState("");
   console.log('imageURL (from Redux):', imageURL)
   console.log('data:', data)
   console.log('castData:', castData)
-
+    const handlePlayVideo=(data)=>{
+      setPlayVideoId(data)
+          setPlayVideo(true)
+    }
   return (
-    <div>
-      <div className="w-full h-[280px] relative hidden lg:block">
+    <div >
+      <div className="w-full h-[280px] relative hidden lg:block ">
         <div className="w-full h-full">
           <img
             src={imageURL + data?.backdrop_path}
@@ -40,11 +52,12 @@ const Details = () => {
       </div>
 
       <div className="container mx-auto px-3 py-16 lg:py-0  flex flex-col lg:flex-row gap-5 lg:gap-10">
-        <div className="lg:-mt-28 relative mx-auto w-fit lg:mx-0 flex min-w-60">
+        <div className="relative mx-auto lg:-mt-28 lg:mx-0 w-fit min-w-60 ">
           <img
             src={imageURL + data?.poster_path}
             className="h-80 w-60 object-cover rounded"
           />
+          <button onClick={()=>handlePlayVideo(data)} className='mt-3  py-2 px-4 text-center bg-white text-black rounded font-bold text-lg hover:bg-gradient-to-l from-red-500 to-gray-300 hover:scale-105 transition-all '>Play Now </button>
         </div>
 
         <div>
@@ -89,31 +102,54 @@ const Details = () => {
             </p>
           </div>
 
-           
-           <div>
-            <Divider/>
-              <h1 className='font-bold text-lg'>Cast :</h1>
-                <div className='grid grid-cols-[repeat(auto-fit,96px)] gap-3'>
-                    {
-                    castData?.cast?.filter(el=>el?.profile_path).map((StarCast,index)=>{
-                      return(
-                        <div className=''>
-                             <div>
-                              <img src={imageURL+StarCast?.profile_path} className='w-24 h-24  object-cover rounded-full' />
-                             </div>
-                             <p className='font-bold text-center text-sm'>{StarCast?.name}</p>
-                        </div>
-                      )
-                    })}
-                </div>
-           </div>
+          <div>
+            <Divider />
+            <h1 className="font-bold text-lg">Cast :</h1>
+            <div className="grid grid-cols-[repeat(auto-fit,96px)] gap-3">
+              {castData?.cast
+                ?.filter((el) => el?.profile_path)
+                .map((StarCast, index) => {
+                  return (
+                    <div className="">
+                      <div>
+                        <img
+                          src={imageURL + StarCast?.profile_path}
+                          className="w-24 h-24  object-cover rounded-full"
+                        />
+                      </div>
+                      <p className="font-bold text-center text-sm">
+                        {StarCast?.name}
+                      </p>
+                    </div>
+                  )
+                })}
+            </div>
+          </div>
         </div>
       </div>
 
-       <div>
-          <HorizontalScrollCard data={similarData} heading={"Similar "+params?.explore}  media_type={params?.explore}/>
-           <HorizontalScrollCard data={recommendationData} heading={"Recommendation "+params?.explore}  media_type={params?.explore}/>
-       </div>
+      <div>
+        <HorizontalScrollCard
+          data={similarData}
+          heading={'Similar ' + params?.explore}
+          media_type={params?.explore}
+        />
+        <HorizontalScrollCard
+          data={recommendationData}
+          heading={'Recommendation ' + params?.explore}
+          media_type={params?.explore}
+        />
+      </div>
+        <div className='justify-center container items-center'>
+           {
+        playVideo&&(
+             <VideoPlay data={playVideoId}  close={()=>setPlayVideo(false)} media_type={params?.explore}/> 
+          )
+        }
+        </div>
+       
+        
+       
     </div>
   )
 }

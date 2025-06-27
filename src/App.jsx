@@ -38,9 +38,9 @@ useEffect(() => {
     fetchConfiguration();
   }, []);
   return (
-    <main className='pb-14 lg:pb-0'>
+    <main className=''>
             <Header/>
-         <div className='min-h-[90vh]' >
+         <div className='' >
           <Outlet/>
           </div>
           <Footer/>
